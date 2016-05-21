@@ -1,7 +1,21 @@
 <resources>
     <string name="app_name">NYTimes</string>
     <string name="action_settings">Settings</string>
+    <string name="action_article">Search</string>
     <string name="hint">Enter Search Query</string>
     <string name="search">Search</string>
     <string name="title_activity_article">ArticleActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <string-array name="sort_options">
+        <item>Relevance</item>
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
+
+    <string name="btnDate">Select Date</string>
+    <string name="sportsTxt">Sports</string>
+    <string name="fashionTxt"><![CDATA[Fashion & Style]]></string>
+    <string name="artsTxt">Arts</string>
+    <string name="title_activity_filter">FilterActivity</string>
 </resources>

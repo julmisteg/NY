@@ -9,9 +9,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.gaetanejulmiste.nytimes.Models.Article;
 import com.example.gaetanejulmiste.nytimes.R;
-import com.squareup.picasso.Picasso;
+//import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -37,7 +38,8 @@ public class ArticleArrayAdapter extends ArrayAdapter<Article> {
 
             String thumbNail = article.getThumbNail();
             if (!TextUtils.isEmpty(thumbNail)) {
-                Picasso.with(getContext()).load(thumbNail).into(imageView);
+               // Picasso.with(getContext()).load(thumbNail).into(imageView);
+                Glide.with(getContext()).load(thumbNail).into(imageView);
             }
 
 

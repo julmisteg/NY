@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -20,9 +24,13 @@ import android.widget.Toast;
 
 import com.example.gaetanejulmiste.nytimes.Activities.ArticleActivity;
 import com.example.gaetanejulmiste.nytimes.Adapters.ArticleArrayAdapter;
+import com.example.gaetanejulmiste.nytimes.Fragments.SettingsFragment;
 import com.example.gaetanejulmiste.nytimes.Listeners.EndlessScrollListener;
 import com.example.gaetanejulmiste.nytimes.Models.Article;
 import com.example.gaetanejulmiste.nytimes.R;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -41,6 +49,13 @@ public class SearchActivity extends AppCompatActivity {
     Button btnSearch;
     ArrayList<Article> articles;
     ArrayAdapter adapter;
+    String search;
+    SettingsFragment sdialog;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +66,9 @@ public class SearchActivity extends AppCompatActivity {
         setupViews();
 
 
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client2 = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     public void setupViews() {
@@ -91,7 +109,32 @@ public class SearchActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_search, menu);
-        return true;
+
+        MenuItem searchItem = menu.findItem(R.id.action_article);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                //searchView.clearFocus();
+                //addMoreArticles(0);
+
+                addSearchActionBar(query);
+                etQuery.setVisibility(View.INVISIBLE);
+                btnSearch.setVisibility(View.INVISIBLE);
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+
+        //return true;*/
+        // return true;
     }
 
     @Override
@@ -108,6 +151,38 @@ public class SearchActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    public void addSearchActionBar(String query) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+        RequestParams params = new RequestParams();
+        params.put("api-key", "1567a6e4782c43dea0f707ff17544f66");
+        params.put("page", "0");
+        params.put("q", query);
+        client.get(url, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                Log.d("DEBUG", response.toString());
+                JSONArray articleJsonResults = null;
+
+                try {
+                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+
+
+                    adapter.addAll(Article.fromJsonArray(articleJsonResults));
+                    Log.d("DEBUG", adapter.toString());
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+
 
     public void onArticleSearch(View view) {
 
@@ -207,4 +282,20 @@ public class SearchActivity extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
+
+
+    public void addFilters(MenuItem item) {
+        Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivityForResult(i, 1);
+
+
+    }
+
+   /*public void addFilters(MenuItem item) {
+        FragmentManager fgm = getSupportFragmentManager();
+       // sdialog.show(fgm,"advanceSearch");
+
+    }*/
+
+
 }
